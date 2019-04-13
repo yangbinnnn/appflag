@@ -2,7 +2,6 @@ package appflag
 
 import (
 	"flag"
-	"fmt"
 	"strings"
 )
 
@@ -31,7 +30,7 @@ func (this *AppFlag) AddCmd(name, desc string, cmd AppCmd) {
 	this.appCmds[name] = cmd
 }
 
-func (this *AppFlag) Exec(args []string) {
+func (this *AppFlag) Exec(args []string) (err error) {
 	if len(args) == 0 {
 		this.flagSet.Parse(args)
 		this.flagSet.Usage()
@@ -48,8 +47,7 @@ func (this *AppFlag) Exec(args []string) {
 	subFlag := this.subFlags[sub]
 	if subFlag != nil {
 		// 进入子命令中
-		subFlag.Exec(args[1:])
-		return
+		return subFlag.Exec(args[1:])
 	}
 
 	// 执行当前命令
@@ -57,14 +55,10 @@ func (this *AppFlag) Exec(args []string) {
 	for name, run := range this.cmds {
 		if *run {
 			cmd := this.appCmds[name]
-			err := cmd(args[1:])
-			if err != nil {
-				fmt.Printf("run %s failed, error %s.", name, err.Error())
-				return
-			}
-			return
+			return cmd(args[1:])
 		}
 	}
+	return
 }
 
 func (this *AppFlag) AddSubFlag(name, desc string, sub *AppFlag) {

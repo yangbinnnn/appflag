@@ -16,6 +16,11 @@ func main() {
 		return
 	})
 
+	app.AddCmd("err", "return error", func(args []string) (err error) {
+		err = fmt.Errorf("low power")
+		return
+	})
+
 	subHello := NewAppFlag("hello")
 	subHello.AddCmd("say", "say something", func(args []string) (err error) {
 		var msg string
@@ -70,5 +75,5 @@ func main() {
 
 	app.AddSubFlag(subHello.Name, "hello cmd set", subHello)
 	app.AddSubFlag(migrate.Name, "migrate cmd set", migrate)
-	app.Exec(os.Args[1:])
+	fmt.Println(app.Exec(os.Args[1:]))
 }
